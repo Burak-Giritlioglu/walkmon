@@ -1,18 +1,12 @@
+
 import React from "react";
-
-import {
-  Pressable,
-  StyleSheet,
-} from "react-native";
-
+import { Image, Pressable, StyleSheet } from "react-native";
 import Animated, {
   SharedValue,
   useAnimatedStyle,
 } from "react-native-reanimated";
 
-import {
-  HOME_POSITION,
-} from "../hooks/useCharacterMovement";
+import { HOME_POSITION } from "../hooks/useCharacterMovement";
 
 type Props = {
   babyX: SharedValue<number>;
@@ -25,61 +19,55 @@ export default function BabyCharacter({
   babyY,
   onPress,
 }: Props) {
-  const babyStyle =
-    useAnimatedStyle(() => {
-      return {
-        transform: [
-          {
-            translateX:
-              babyX.value -
-              HOME_POSITION.x,
-          },
-          {
-            translateY:
-              babyY.value -
-              HOME_POSITION.y,
-          },
-        ],
-      };
-    });
+  const babyStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: babyX.value - HOME_POSITION.x,
+      },
+      {
+        translateY: babyY.value - HOME_POSITION.y,
+      },
+    ],
+  }));
 
   return (
     <Animated.View
-      style={[
-        styles.babyContainer,
-        babyStyle,
-      ]}
+      style={[styles.babyContainer, babyStyle]}
     >
       <Pressable
         onPress={onPress}
         hitSlop={12}
         style={styles.babyButton}
-      />
+      >
+        <Image
+          source={require("../../assets/characters/elf-baby-sitting.png")}
+          style={styles.babyImage}
+          resizeMode="contain"
+        />
+      </Pressable>
     </Animated.View>
   );
 }
 
-const styles =
-  StyleSheet.create({
-    babyContainer: {
-      position: "absolute",
+const styles = StyleSheet.create({
+  babyContainer: {
+    position: "absolute",
+    left: 105,
+    top: 280,
+    width: 180,
+    height: 180,
+    zIndex: 30,
+  },
 
-      left: 163,
-      top: 338,
+  babyButton: {
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-      width: 54,
-      height: 54,
-
-      zIndex: 30,
-    },
-
-    babyButton: {
-      width: 54,
-      height: 54,
-
-      borderRadius: 27,
-
-      backgroundColor:
-        "#7E9B76",
-    },
-  });
+  babyImage: {
+    width: "100%",
+    height: "100%",
+  },
+});
