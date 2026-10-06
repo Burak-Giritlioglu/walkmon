@@ -1,6 +1,5 @@
-import {
-  NeedType,
-} from "../character/needs";
+import type { NeedType } from "../character/needs";
+import { Dimensions } from "react-native";
 
 export type BabyAction =
   | "PLAYING"
@@ -12,15 +11,12 @@ export type BabyAction =
 
 export type NeedEffect = {
   need: NeedType;
-
   amount: number;
-
   interval: number;
 };
 
 export type WorldObject = {
   id: string;
-
   name: string;
 
   x: number;
@@ -39,25 +35,73 @@ export type WorldObject = {
   effect?: NeedEffect;
 };
 
+const SCREEN_WIDTH =
+  Dimensions.get("window").width;
+
 export const babyRoomObjects: WorldObject[] = [
   // =========================
-  // STARTING OBJECTS
+  // PLAY RUG
+  // Decorative floor object only
+  // No interaction / no need effect
+  // =========================
+
+  {
+    id: "play-rug",
+    name: "Play Rug",
+
+    x: 50,
+    y: 500,
+
+    width: 300,
+    height: 200,
+
+    interactionPoint: {
+      x: 200,
+      y: 590,
+    },
+
+    action: "PLAYING",
+  },
+
+  // =========================
+  // BOOKSHELF
+  // =========================
+
+  {
+    id: "bookshelf",
+    name: "Bookshelf",
+
+    x: 65,
+    y: 350,
+
+    width: 120,
+    height: 155,
+
+    interactionPoint: {
+      x: 145,
+      y: 495,
+    },
+
+    action: "READING",
+  },
+
+  // =========================
+  // CRIB
   // =========================
 
   {
     id: "crib",
-
     name: "Crib",
 
-    x: 25,
-    y: 260,
+    x: -35,
+    y: 440,
 
-    width: 130,
-    height: 105,
+    width: 180,
+    height: 130,
 
     interactionPoint: {
-      x: 175,
-      y: 390,
+      x: 50,
+      y: 550,
     },
 
     action: "SLEEPING",
@@ -69,20 +113,23 @@ export const babyRoomObjects: WorldObject[] = [
     },
   },
 
+  // =========================
+  // FIREPLACE
+  // =========================
+
   {
     id: "fireplace",
-
     name: "Fireplace",
 
-    x: 280,
-    y: 235,
+    x: SCREEN_WIDTH - 120,
+    y: 350,
 
-    width: 95,
-    height: 130,
+    width: 180,
+    height: 200,
 
     interactionPoint: {
-      x: 255,
-      y: 370,
+      x: SCREEN_WIDTH - 110,
+      y: 560,
     },
 
     action: "WARMING",
@@ -95,23 +142,22 @@ export const babyRoomObjects: WorldObject[] = [
   },
 
   // =========================
-  // MILESTONE OBJECTS
+  // PLUSH TOY
   // =========================
 
   {
     id: "toy",
-
     name: "Plush Toy",
 
-    x: 245,
-    y: 360,
+    x: 110,
+    y: 520,
 
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 80,
 
     interactionPoint: {
-      x: 235,
-      y: 415,
+      x: 180,
+      y: 600,
     },
 
     action: "PLAYING",
@@ -123,20 +169,23 @@ export const babyRoomObjects: WorldObject[] = [
     },
   },
 
+  // =========================
+  // HIGH CHAIR
+  // =========================
+
   {
     id: "high-chair",
-
     name: "High Chair",
 
-    x: 165,
-    y: 245,
+    x: 230,
+    y: 440,
 
-    width: 70,
-    height: 80,
+    width: 105,
+    height: 100,
 
     interactionPoint: {
-      x: 200,
-      y: 350,
+      x: 250,
+      y: 540,
     },
 
     action: "EATING",
@@ -148,39 +197,23 @@ export const babyRoomObjects: WorldObject[] = [
     },
   },
 
+  // =========================
+  // ACTIVITY TABLE
+  // =========================
+
   {
-    id: "bookshelf",
+    id: "activity-table",
+    name: "Activity Table",
 
-    name: "Bookshelf",
+    x: 205,
+    y: 545,
 
-    x: 15,
-    y: 120,
-
-    width: 90,
+    width: 255,
     height: 125,
 
     interactionPoint: {
-      x: 125,
-      y: 285,
-    },
-
-    action: "READING",
-  },
-
-  {
-    id: "toy-basket",
-
-    name: "Toy Basket",
-
-    x: 105,
-    y: 360,
-
-    width: 65,
-    height: 55,
-
-    interactionPoint: {
-      x: 180,
-      y: 410,
+      x: 350,
+      y: 615,
     },
 
     action: "PLAYING",
@@ -192,9 +225,12 @@ export const babyRoomObjects: WorldObject[] = [
     },
   },
 
+  // =========================
+  // GARDEN DOOR
+  // =========================
+
   {
     id: "garden-door",
-
     name: "Garden Door",
 
     x: 275,

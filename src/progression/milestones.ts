@@ -50,7 +50,7 @@ export const BABY_MILESTONES: Milestone[] = [
   {
     id: "plush-toy",
     title: "🧸 Plush Toy",
-    requiredSteps: 2000,
+    requiredSteps: 6000,
 
     unlock: {
       type: "OBJECT",
@@ -61,7 +61,7 @@ export const BABY_MILESTONES: Milestone[] = [
   {
     id: "high-chair",
     title: "🪑 High Chair",
-    requiredSteps: 5000,
+    requiredSteps: 16000,
 
     unlock: {
       type: "OBJECT",
@@ -72,7 +72,7 @@ export const BABY_MILESTONES: Milestone[] = [
   {
     id: "play-rug",
     title: "🧶 Play Rug",
-    requiredSteps: 9000,
+    requiredSteps: 28000,
 
     unlock: {
       type: "OBJECT",
@@ -83,7 +83,7 @@ export const BABY_MILESTONES: Milestone[] = [
   {
     id: "bookshelf",
     title: "📚 Bookshelf",
-    requiredSteps: 14000,
+    requiredSteps: 43000,
 
     unlock: {
       type: "OBJECT",
@@ -92,20 +92,20 @@ export const BABY_MILESTONES: Milestone[] = [
   },
 
   {
-    id: "toy-basket",
-    title: "🧺 Toy Basket",
-    requiredSteps: 20000,
+    id: "activity-table",
+    title: "🧩 Activity Table",
+    requiredSteps: 61000,
 
     unlock: {
       type: "OBJECT",
-      objectId: "toy-basket",
+      objectId: "activity-table",
     },
   },
 
   {
     id: "room-upgrade",
     title: "🪟 Cozy Room",
-    requiredSteps: 27000,
+    requiredSteps: 81000,
 
     unlock: {
       type: "ROOM_UPGRADE",
@@ -116,7 +116,7 @@ export const BABY_MILESTONES: Milestone[] = [
   {
     id: "garden-door",
     title: "🚪 Garden Door",
-    requiredSteps: 35000,
+    requiredSteps: 100000,
 
     unlock: {
       type: "OBJECT",
@@ -127,7 +127,7 @@ export const BABY_MILESTONES: Milestone[] = [
   {
     id: "child-stage",
     title: "🌱 Growing Up",
-    requiredSteps: 42000,
+    requiredSteps: 120000,
 
     unlock: {
       type: "STAGE",

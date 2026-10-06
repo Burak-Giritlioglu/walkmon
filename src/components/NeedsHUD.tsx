@@ -131,32 +131,20 @@ const styles =
   StyleSheet.create({
     container: {
       position: "absolute",
-
       top: 14,
       left: 14,
-
       width: 150,
-
       paddingHorizontal: 12,
       paddingTop: 11,
       paddingBottom: 8,
-
       borderRadius: radius.md,
-
-      backgroundColor:
-        colors.glass,
-
+      backgroundColor: colors.glass,
       borderWidth: 1,
-
-      borderColor:
-        colors.glassBorder,
-
+      borderColor: colors.glassBorder,
       zIndex: 40,
-
       shadowColor: "#000000",
       shadowOpacity: 0.12,
       shadowRadius: 10,
-
       shadowOffset: {
         width: 0,
         height: 4,

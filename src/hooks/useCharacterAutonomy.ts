@@ -11,7 +11,8 @@ import type {
 import {
   CharacterNeeds,
   NeedType,
-  NEED_SATISFIED_THRESHOLD,
+  NEED_TRIGGER_THRESHOLD,
+  MAX_NEED_VALUE,
 } from "../character/needs";
 
 import type {
@@ -170,6 +171,7 @@ export function useCharacterAutonomy({
 
     if (!stillAvailable) {
       updateActiveObject(null);
+
       updateControlMode(
         "IDLE"
       );
@@ -185,6 +187,7 @@ export function useCharacterAutonomy({
     mode: ControlMode
   ) => {
     updateActiveObject(null);
+
     updateControlMode(mode);
 
     moveToObject(
@@ -197,6 +200,7 @@ export function useCharacterAutonomy({
     mode: ControlMode
   ) => {
     updateActiveObject(null);
+
     updateControlMode(mode);
 
     moveHome(() => {
@@ -256,9 +260,6 @@ export function useCharacterAutonomy({
 
     const timeout =
       setTimeout(() => {
-        // Kullanıcı bu sırada başka
-        // objeye gittiyse eski activity
-        // ödül vermesin.
         if (
           activeObjectRef.current
             ?.id !==
@@ -276,14 +277,13 @@ export function useCharacterAutonomy({
           }
         );
 
-        // Need-based AUTO activity'yi
-        // satisfaction sistemi yönetiyor.
+        // Need effect'i olmayan
+        // aktiviteler duration sonunda
+        // eve döner.
         //
-        // User activity veya effect'siz
-        // activity tamamlandıysa eve dön.
+        // Need effect'i olan aktiviteler
+        // need 100 olana kadar devam eder.
         if (
-          controlModeRef.current ===
-            "USER" ||
           !activeObjectRef.current
             ?.effect
         ) {
@@ -337,15 +337,18 @@ export function useCharacterAutonomy({
   }, []);
 
   // =========================
-  // AUTO NEED SATISFIED
+  // NEED INTERACTION MANAGEMENT
   // =========================
 
   useEffect(() => {
     const interval =
       setInterval(() => {
+        const mode =
+          controlModeRef.current;
+
         if (
-          controlModeRef.current !==
-          "AUTO"
+          mode !== "AUTO" &&
+          mode !== "USER"
         ) {
           return;
         }
@@ -359,21 +362,98 @@ export function useCharacterAutonomy({
           return;
         }
 
-        const need =
+        const currentNeed =
           object.effect.need;
 
-        const value =
+        const currentValue =
           needsRef.current[
-            need
+            currentNeed
           ];
 
+        // =========================
+        // USER INTERACTION
+        // =========================
+
+        // Kullanıcı bebeği bir need
+        // objesine gönderdiyse,
+        // need 100 olduğunda aktivite
+        // biter ve bebek eve döner.
+        if (mode === "USER") {
+          if (
+            currentValue >=
+            MAX_NEED_VALUE
+          ) {
+            goHome("USER");
+          }
+
+          return;
+        }
+
+        // =========================
+        // AUTO INTERACTION
+        // =========================
+
+        // AUTO modunda başka 40 altı
+        // need var mı kontrol et.
+        const otherLowNeeds =
+          activeNeedsRef.current
+            .filter(
+              (need) =>
+                need !== currentNeed
+            )
+            .filter(
+              (need) =>
+                needsRef.current[
+                  need
+                ] <
+                NEED_TRIGGER_THRESHOLD
+            )
+            .sort(
+              (a, b) =>
+                needsRef.current[a] -
+                needsRef.current[b]
+            );
+
+        // Başka 40 altı need varsa
+        // en düşük olanına geç.
         if (
-          value <
-          NEED_SATISFIED_THRESHOLD
+          otherLowNeeds.length > 0
+        ) {
+          const target =
+            findAutonomousTarget(
+              needsRef.current,
+
+              otherLowNeeds,
+
+              availableObjectsRef.current
+            );
+
+          if (
+            target &&
+            target.object.id !==
+              object.id
+          ) {
+            goToObject(
+              target.object,
+              "AUTO"
+            );
+
+            return;
+          }
+        }
+
+        // Başka düşük need yoksa
+        // mevcut need'i 100'e kadar
+        // doldurmaya devam et.
+        if (
+          currentValue <
+          MAX_NEED_VALUE
         ) {
           return;
         }
 
+        // Need 100 oldu ve başka
+        // 40 altı need yok.
         goHome("AUTO");
       }, 500);
 
@@ -400,9 +480,37 @@ export function useCharacterAutonomy({
       goHome("USER");
     };
 
+  // =========================
+  // SPECIAL VISUAL STATES
+  // =========================
+
+  const isBabySleeping =
+    activeObject?.id === "crib";
+
+  const isBabyPlayingWithTeddy =
+    activeObject?.id === "toy";
+
+  const isBabyEating =
+    activeObject?.id ===
+    "high-chair";
+
+  const isBabyReading =
+    activeObject?.id ===
+    "bookshelf";
+
+  const isBabyUsingActivityTable =
+    activeObject?.id ===
+    "activity-table";
+
   return {
     activeObject,
     controlMode,
+
+    isBabySleeping,
+    isBabyPlayingWithTeddy,
+    isBabyEating,
+    isBabyReading,
+    isBabyUsingActivityTable,
 
     handleObjectPress,
     handleCenterPress,

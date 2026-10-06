@@ -45,7 +45,7 @@ export function findAutonomousTarget(
   ];
 
   // =========================
-  // FIND URGENT ACTIVE NEEDS
+  // FIND ACTIVE LOW NEEDS
   // =========================
 
   const urgentNeeds =
@@ -57,7 +57,7 @@ export function findAutonomousTarget(
       )
       .filter(
         (item) =>
-          item.value <=
+          item.value <
           NEED_TRIGGER_THRESHOLD
       )
       .sort(

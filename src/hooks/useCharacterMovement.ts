@@ -1,69 +1,61 @@
 import {
+  cancelAnimation,
   runOnJS,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-
-import {
-  WorldObject,
-} from "../world/worldObjects";
+import type { WorldObject } from "../world/worldObjects";
 
 export const HOME_POSITION = {
   x: 190,
-  y: 365,
+  y: 750,
 };
 
-const WALK_SPEED = 150;
+const WALK_SPEED = 70;
+
+export type MovementDirection =
+  | "IDLE"
+  | "BACK"
+  | "FORWARD";
 
 export function useCharacterMovement() {
-  const babyX = useSharedValue(
-    HOME_POSITION.x
-  );
+  const babyX = useSharedValue(HOME_POSITION.x);
+  const babyY = useSharedValue(HOME_POSITION.y);
 
-  const babyY = useSharedValue(
-    HOME_POSITION.y
-  );
+  const movementDirection =
+    useSharedValue<MovementDirection>("IDLE");
 
   const moveToObject = (
     object: WorldObject,
-    onArrival: (
-      object: WorldObject
-    ) => void
+    onArrival: (object: WorldObject) => void
   ) => {
-    const targetX =
-      object.interactionPoint.x;
+    cancelAnimation(babyX);
+    cancelAnimation(babyY);
 
-    const targetY =
-      object.interactionPoint.y;
+    const targetX = object.interactionPoint.x;
+    const targetY = object.interactionPoint.y;
 
-    const currentX =
-      babyX.value;
+    const dx = targetX - babyX.value;
+    const dy = targetY - babyY.value;
 
-    const currentY =
-      babyY.value;
-
-    const dx =
-      targetX - currentX;
-
-    const dy =
-      targetY - currentY;
-
-    const distance = Math.sqrt(
-      dx * dx + dy * dy
-    );
+    const distance = Math.sqrt(dx * dx + dy * dy);
 
     const duration = Math.max(
       250,
-      (distance / WALK_SPEED) *
-        1000
+      (distance / WALK_SPEED) * 1000
     );
 
-    babyX.value = withTiming(
-      targetX,
-      {
-        duration,
-      }
-    );
+    if (dy < 0) {
+      movementDirection.value = "BACK";
+    } else if (dy > 0) {
+      movementDirection.value = "FORWARD";
+    } else {
+      movementDirection.value = "IDLE";
+    }
+
+    babyX.value = withTiming(targetX, {
+      duration,
+    });
 
     babyY.value = withTiming(
       targetY,
@@ -72,47 +64,38 @@ export function useCharacterMovement() {
       },
       (finished) => {
         if (finished) {
-          runOnJS(onArrival)(
-            object
-          );
+          movementDirection.value = "IDLE";
+          runOnJS(onArrival)(object);
         }
       }
     );
   };
 
-  const moveHome = (
-    onArrival?: () => void
-  ) => {
-    const currentX =
-      babyX.value;
+  const moveHome = (onArrival?: () => void) => {
+    cancelAnimation(babyX);
+    cancelAnimation(babyY);
 
-    const currentY =
-      babyY.value;
+    const dx = HOME_POSITION.x - babyX.value;
+    const dy = HOME_POSITION.y - babyY.value;
 
-    const dx =
-      HOME_POSITION.x -
-      currentX;
-
-    const dy =
-      HOME_POSITION.y -
-      currentY;
-
-    const distance = Math.sqrt(
-      dx * dx + dy * dy
-    );
+    const distance = Math.sqrt(dx * dx + dy * dy);
 
     const duration = Math.max(
       250,
-      (distance / WALK_SPEED) *
-        1000
+      (distance / WALK_SPEED) * 1000
     );
 
-    babyX.value = withTiming(
-      HOME_POSITION.x,
-      {
-        duration,
-      }
-    );
+    if (dy < 0) {
+      movementDirection.value = "BACK";
+    } else if (dy > 0) {
+      movementDirection.value = "FORWARD";
+    } else {
+      movementDirection.value = "IDLE";
+    }
+
+    babyX.value = withTiming(HOME_POSITION.x, {
+      duration,
+    });
 
     babyY.value = withTiming(
       HOME_POSITION.y,
@@ -120,11 +103,12 @@ export function useCharacterMovement() {
         duration,
       },
       (finished) => {
-        if (
-          finished &&
-          onArrival
-        ) {
-          runOnJS(onArrival)();
+        if (finished) {
+          movementDirection.value = "IDLE";
+
+          if (onArrival) {
+            runOnJS(onArrival)();
+          }
         }
       }
     );
@@ -133,7 +117,7 @@ export function useCharacterMovement() {
   return {
     babyX,
     babyY,
-
+    movementDirection,
     moveToObject,
     moveHome,
   };
