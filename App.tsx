@@ -1,3 +1,4 @@
+
 import React, {
   useEffect,
   useState,
@@ -26,74 +27,116 @@ import type {
 } from "./src/storage/gameStorage";
 
 export default function App() {
+  // =========================
+  // STATE
+  // =========================
+
   const [
     initialSave,
     setInitialSave,
-  ] =
-    useState<GameSaveData | null>(
-      null
-    );
+  ] = useState<GameSaveData | null>(null);
 
   const [
     isLoading,
     setIsLoading,
-  ] =
-    useState(true);
+  ] = useState(true);
+
+  const [
+    isResetting,
+    setIsResetting,
+  ] = useState(false);
 
   const [
     gameKey,
     setGameKey,
-  ] =
-    useState(0);
+  ] = useState(0);
+
+  // =========================
+  // INITIAL LOAD
+  // =========================
 
   useEffect(() => {
+    let mounted = true;
+
     async function initializeGame() {
-      const save =
-        await loadGame();
+      const save = await loadGame();
+
+      if (!mounted) {
+        return;
+      }
 
       setInitialSave(save);
-
       setIsLoading(false);
     }
 
     initializeGame();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const handleResetGame =
-    async () => {
+  // =========================
+  // RESET
+  // =========================
+
+  useEffect(() => {
+    if (!isResetting) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function resetGame() {
+      // GameScreen has been unmounted.
+      // Pending saves complete before clearing.
       await clearGameSave();
 
+      if (cancelled) {
+        return;
+      }
+
       setInitialSave(null);
+      setGameKey((current) => current + 1);
+      setIsResetting(false);
+    }
 
-      setGameKey(
-        (current) =>
-          current + 1
-      );
+    resetGame();
+
+    return () => {
+      cancelled = true;
     };
+  }, [isResetting]);
 
-  if (isLoading) {
+  const handleResetGame = () => {
+    setIsResetting(true);
+  };
+
+  // =========================
+  // LOADING / RESET SCREEN
+  // =========================
+
+  if (isLoading || isResetting) {
     return (
       <GestureHandlerRootView
         style={styles.root}
       >
-        <View
-          style={
-            styles.loadingContainer
-          }
-        >
+        <View style={styles.loadingContainer}>
           <ActivityIndicator />
 
-          <Text
-            style={
-              styles.loadingText
-            }
-          >
-            Loading Walkmon...
+          <Text style={styles.loadingText}>
+            {isResetting
+              ? "Resetting Walkmon..."
+              : "Loading Walkmon..."}
           </Text>
         </View>
       </GestureHandlerRootView>
     );
   }
+
+  // =========================
+  // GAME
+  // =========================
 
   return (
     <GestureHandlerRootView
@@ -101,40 +144,32 @@ export default function App() {
     >
       <GameScreen
         key={gameKey}
-        initialSave={
-          initialSave
-        }
-        onResetGame={
-          handleResetGame
-        }
+        initialSave={initialSave}
+        onResetGame={handleResetGame}
       />
     </GestureHandlerRootView>
   );
 }
 
-const styles =
-  StyleSheet.create({
-    root: {
-      flex: 1,
-    },
+// =========================
+// STYLES
+// =========================
 
-    loadingContainer: {
-      flex: 1,
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
 
-      alignItems: "center",
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F4EFE7",
+  },
 
-      justifyContent:
-        "center",
-
-      backgroundColor:
-        "#F4EFE7",
-    },
-
-    loadingText: {
-      marginTop: 12,
-
-      fontSize: 14,
-
-      color: "#7B7067",
-    },
-  });
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: "#7B7067",
+  },
+});

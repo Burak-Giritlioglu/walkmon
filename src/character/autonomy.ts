@@ -4,9 +4,9 @@ import {
   NEED_TRIGGER_THRESHOLD,
 } from "./needs";
 
-import {
+import type {
   WorldObject,
-} from "../world/worldObjects";
+} from "../world/worldTypes";
 
 export type AutonomousTarget = {
   need: NeedType;

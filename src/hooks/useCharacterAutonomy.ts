@@ -1,40 +1,32 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
 
-import type {
-  MutableRefObject,
-} from "react";
+import { useEffect, useRef, useState } from "react";
+
+import type { MutableRefObject } from "react";
 
 import {
-  CharacterNeeds,
-  NeedType,
   NEED_TRIGGER_THRESHOLD,
   MAX_NEED_VALUE,
 } from "../character/needs";
 
 import type {
-  CharacterStat,
-} from "../character/stats";
+  CharacterNeeds,
+  NeedType,
+} from "../character/needs";
 
-import {
-  getActivity,
-} from "../character/activities";
+import type { CharacterStat } from "../character/stats";
 
-import {
+import type { ActivityDefinition } from "../character/activityTypes";
+
+import type {
+  CharacterAction,
   WorldObject,
-} from "../world/worldObjects";
+} from "../world/worldTypes";
 
-import {
-  findAutonomousTarget,
-} from "../character/autonomy";
+import { findAutonomousTarget } from "../character/autonomy";
 
-type ControlMode =
-  | "IDLE"
-  | "USER"
-  | "AUTO";
+type ControlMode = "IDLE" | "USER" | "AUTO";
+
+const NEED_SWITCH_THRESHOLD = 80;
 
 type UseCharacterAutonomyProps = {
   needsRef: MutableRefObject<CharacterNeeds>;
@@ -42,6 +34,10 @@ type UseCharacterAutonomyProps = {
   activeNeeds: NeedType[];
 
   availableObjects: WorldObject[];
+
+  activities: Partial<
+    Record<CharacterAction, ActivityDefinition>
+  >;
 
   changeNeed: (
     need: NeedType,
@@ -59,9 +55,7 @@ type UseCharacterAutonomyProps = {
 
   moveToObject: (
     object: WorldObject,
-    onArrival: (
-      object: WorldObject
-    ) => void
+    onArrival: (object: WorldObject) => void
   ) => void;
 
   moveHome: (
@@ -71,61 +65,39 @@ type UseCharacterAutonomyProps = {
 
 export function useCharacterAutonomy({
   needsRef,
-
   activeNeeds,
   availableObjects,
-
+  activities,
   changeNeed,
   protectNeed,
   changeStat,
-
   moveToObject,
   moveHome,
 }: UseCharacterAutonomyProps) {
-  const [
-    activeObject,
-    setActiveObject,
-  ] =
-    useState<WorldObject | null>(
-      null
-    );
+  const [activeObject, setActiveObject] =
+    useState<WorldObject | null>(null);
 
-  const [
-    controlMode,
-    setControlMode,
-  ] =
-    useState<ControlMode>(
-      "IDLE"
-    );
+  const [controlMode, setControlMode] =
+    useState<ControlMode>("IDLE");
 
   const activeObjectRef =
-    useRef<WorldObject | null>(
-      null
-    );
+    useRef<WorldObject | null>(null);
 
   const controlModeRef =
-    useRef<ControlMode>(
-      "IDLE"
-    );
+    useRef<ControlMode>("IDLE");
 
   const activeNeedsRef =
-    useRef<NeedType[]>(
-      activeNeeds
-    );
+    useRef<NeedType[]>(activeNeeds);
 
   const availableObjectsRef =
-    useRef<WorldObject[]>(
-      availableObjects
-    );
+    useRef<WorldObject[]>(availableObjects);
 
   useEffect(() => {
-    activeNeedsRef.current =
-      activeNeeds;
+    activeNeedsRef.current = activeNeeds;
   }, [activeNeeds]);
 
   useEffect(() => {
-    availableObjectsRef.current =
-      availableObjects;
+    availableObjectsRef.current = availableObjects;
   }, [availableObjects]);
 
   // =========================
@@ -135,23 +107,18 @@ export function useCharacterAutonomy({
   const updateActiveObject = (
     object: WorldObject | null
   ) => {
-    activeObjectRef.current =
-      object;
-
+    activeObjectRef.current = object;
     setActiveObject(object);
 
     protectNeed(
-      object?.effect?.need ??
-        null
+      object?.effect?.need ?? null
     );
   };
 
   const updateControlMode = (
     mode: ControlMode
   ) => {
-    controlModeRef.current =
-      mode;
-
+    controlModeRef.current = mode;
     setControlMode(mode);
   };
 
@@ -165,17 +132,12 @@ export function useCharacterAutonomy({
     const stillAvailable =
       availableObjectsRef.current.some(
         (availableObject) =>
-          availableObject.id ===
-          object.id
+          availableObject.id === object.id
       );
 
     if (!stillAvailable) {
       updateActiveObject(null);
-
-      updateControlMode(
-        "IDLE"
-      );
-
+      updateControlMode("IDLE");
       return;
     }
 
@@ -187,7 +149,6 @@ export function useCharacterAutonomy({
     mode: ControlMode
   ) => {
     updateActiveObject(null);
-
     updateControlMode(mode);
 
     moveToObject(
@@ -200,13 +161,10 @@ export function useCharacterAutonomy({
     mode: ControlMode
   ) => {
     updateActiveObject(null);
-
     updateControlMode(mode);
 
     moveHome(() => {
-      updateControlMode(
-        "IDLE"
-      );
+      updateControlMode("IDLE");
     });
   };
 
@@ -215,22 +173,18 @@ export function useCharacterAutonomy({
   // =========================
 
   useEffect(() => {
-    if (
-      !activeObject?.effect
-    ) {
+    if (!activeObject?.effect) {
       return;
     }
 
-    const effect =
-      activeObject.effect;
+    const effect = activeObject.effect;
 
-    const interval =
-      setInterval(() => {
-        changeNeed(
-          effect.need,
-          effect.amount
-        );
-      }, effect.interval);
+    const interval = setInterval(() => {
+      changeNeed(
+        effect.need,
+        effect.amount
+      );
+    }, effect.interval);
 
     return () => {
       clearInterval(interval);
@@ -247,89 +201,77 @@ export function useCharacterAutonomy({
     }
 
     const activity =
-      getActivity(
-        activeObject.action
-      );
+      activities[activeObject.action] ?? null;
 
     if (!activity) {
       return;
     }
 
-    const activityObjectId =
-      activeObject.id;
+    const activityObjectId = activeObject.id;
 
-    const timeout =
-      setTimeout(() => {
-        if (
-          activeObjectRef.current
-            ?.id !==
-          activityObjectId
-        ) {
-          return;
-        }
+    const timeout = setTimeout(() => {
+      if (
+        activeObjectRef.current?.id !==
+        activityObjectId
+      ) {
+        return;
+      }
 
-        activity.statRewards.forEach(
-          (reward) => {
-            changeStat(
-              reward.stat,
-              reward.amount
-            );
-          }
-        );
-
-        // Need effect'i olmayan
-        // aktiviteler duration sonunda
-        // eve döner.
-        //
-        // Need effect'i olan aktiviteler
-        // need 100 olana kadar devam eder.
-        if (
-          !activeObjectRef.current
-            ?.effect
-        ) {
-          goHome(
-            controlModeRef.current
+      activity.statRewards.forEach(
+        (reward) => {
+          changeStat(
+            reward.stat,
+            reward.amount
           );
         }
-      }, activity.duration);
+      );
+
+      // Need effect'i olmayan aktiviteler
+      // süre sonunda eve döner.
+      // Need effect'i olanlar ihtiyaç
+      // yönetimi tarafından sonlandırılır.
+
+      if (
+        !activeObjectRef.current?.effect
+      ) {
+        goHome(
+          controlModeRef.current
+        );
+      }
+    }, activity.duration);
 
     return () => {
       clearTimeout(timeout);
     };
-  }, [activeObject]);
+  }, [activeObject, activities]);
 
   // =========================
   // AUTONOMY
   // =========================
 
   useEffect(() => {
-    const interval =
-      setInterval(() => {
-        if (
-          controlModeRef.current !==
-          "IDLE"
-        ) {
-          return;
-        }
+    const interval = setInterval(() => {
+      if (
+        controlModeRef.current !== "IDLE"
+      ) {
+        return;
+      }
 
-        const target =
-          findAutonomousTarget(
-            needsRef.current,
+      const target = findAutonomousTarget(
+        needsRef.current,
+        activeNeedsRef.current,
+        availableObjectsRef.current
+      );
 
-            activeNeedsRef.current,
+      if (!target) {
+        return;
+      }
 
-            availableObjectsRef.current
-          );
-
-        if (!target) {
-          return;
-        }
-
-        goToObject(
-          target.object,
-          "AUTO"
-        );
-      }, 500);
+      goToObject(
+        target.object,
+        "AUTO"
+      );
+    }, 500);
 
     return () => {
       clearInterval(interval);
@@ -341,121 +283,102 @@ export function useCharacterAutonomy({
   // =========================
 
   useEffect(() => {
-    const interval =
-      setInterval(() => {
-        const mode =
-          controlModeRef.current;
+    const interval = setInterval(() => {
+      const mode = controlModeRef.current;
 
+      if (
+        mode !== "AUTO" &&
+        mode !== "USER"
+      ) {
+        return;
+      }
+
+      const object =
+        activeObjectRef.current;
+
+      if (!object?.effect) {
+        return;
+      }
+
+      const currentNeed =
+        object.effect.need;
+
+      const currentValue =
+        needsRef.current[currentNeed];
+
+      // =========================
+      // USER INTERACTION
+      // =========================
+
+      // Manuel aktivite, ilgili ihtiyaç
+      // 100 olunca tamamlanır.
+
+      if (mode === "USER") {
         if (
-          mode !== "AUTO" &&
-          mode !== "USER"
+          currentValue >= MAX_NEED_VALUE
         ) {
-          return;
+          goHome("USER");
         }
 
-        const object =
-          activeObjectRef.current;
+        return;
+      }
 
-        if (
-          !object?.effect
-        ) {
-          return;
-        }
+      // =========================
+      // AUTO INTERACTION
+      // =========================
 
-        const currentNeed =
-          object.effect.need;
+      // 80'in altındayken mevcut
+      // aktiviteyi kesinlikle bırakma.
 
-        const currentValue =
-          needsRef.current[
-            currentNeed
-          ];
+      if (
+        currentValue < NEED_SWITCH_THRESHOLD
+      ) {
+        return;
+      }
 
-        // =========================
-        // USER INTERACTION
-        // =========================
+      // 80'e ulaştıktan sonra başka
+      // 40 altı ihtiyaç varsa ona geç.
 
-        // Kullanıcı bebeği bir need
-        // objesine gönderdiyse,
-        // need 100 olduğunda aktivite
-        // biter ve bebek eve döner.
-        if (mode === "USER") {
-          if (
-            currentValue >=
-            MAX_NEED_VALUE
-          ) {
-            goHome("USER");
-          }
+      const remainingNeeds =
+        activeNeedsRef.current.filter(
+          (need) =>
+            need !== currentNeed &&
+            needsRef.current[need] <
+              NEED_TRIGGER_THRESHOLD
+        );
 
-          return;
-        }
+      const target = findAutonomousTarget(
+        needsRef.current,
+        remainingNeeds,
+        availableObjectsRef.current
+      );
 
-        // =========================
-        // AUTO INTERACTION
-        // =========================
+      if (
+        target &&
+        target.object.id !== object.id
+      ) {
+        goToObject(
+          target.object,
+          "AUTO"
+        );
 
-        // AUTO modunda başka 40 altı
-        // need var mı kontrol et.
-        const otherLowNeeds =
-          activeNeedsRef.current
-            .filter(
-              (need) =>
-                need !== currentNeed
-            )
-            .filter(
-              (need) =>
-                needsRef.current[
-                  need
-                ] <
-                NEED_TRIGGER_THRESHOLD
-            )
-            .sort(
-              (a, b) =>
-                needsRef.current[a] -
-                needsRef.current[b]
-            );
+        return;
+      }
 
-        // Başka 40 altı need varsa
-        // en düşük olanına geç.
-        if (
-          otherLowNeeds.length > 0
-        ) {
-          const target =
-            findAutonomousTarget(
-              needsRef.current,
+      // Başka acil ihtiyaç yoksa
+      // mevcut ihtiyacı 100'e tamamla.
 
-              otherLowNeeds,
+      if (
+        currentValue < MAX_NEED_VALUE
+      ) {
+        return;
+      }
 
-              availableObjectsRef.current
-            );
+      // İhtiyaç 100 ve başka acil
+      // ihtiyaç yok: eve dön.
 
-          if (
-            target &&
-            target.object.id !==
-              object.id
-          ) {
-            goToObject(
-              target.object,
-              "AUTO"
-            );
-
-            return;
-          }
-        }
-
-        // Başka düşük need yoksa
-        // mevcut need'i 100'e kadar
-        // doldurmaya devam et.
-        if (
-          currentValue <
-          MAX_NEED_VALUE
-        ) {
-          return;
-        }
-
-        // Need 100 oldu ve başka
-        // 40 altı need yok.
-        goHome("AUTO");
-      }, 500);
+      goHome("AUTO");
+    }, 500);
 
     return () => {
       clearInterval(interval);
@@ -475,43 +398,13 @@ export function useCharacterAutonomy({
     );
   };
 
-  const handleCenterPress =
-    () => {
-      goHome("USER");
-    };
-
-  // =========================
-  // SPECIAL VISUAL STATES
-  // =========================
-
-  const isBabySleeping =
-    activeObject?.id === "crib";
-
-  const isBabyPlayingWithTeddy =
-    activeObject?.id === "toy";
-
-  const isBabyEating =
-    activeObject?.id ===
-    "high-chair";
-
-  const isBabyReading =
-    activeObject?.id ===
-    "bookshelf";
-
-  const isBabyUsingActivityTable =
-    activeObject?.id ===
-    "activity-table";
+  const handleCenterPress = () => {
+    goHome("USER");
+  };
 
   return {
     activeObject,
     controlMode,
-
-    isBabySleeping,
-    isBabyPlayingWithTeddy,
-    isBabyEating,
-    isBabyReading,
-    isBabyUsingActivityTable,
-
     handleObjectPress,
     handleCenterPress,
   };

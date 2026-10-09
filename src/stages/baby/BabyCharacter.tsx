@@ -14,7 +14,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 
-import type { MovementDirection } from "../hooks/useCharacterMovement";
+import type { MovementDirection } from "../../hooks/useCharacterMovement";
 
 type Props = {
   babyX: SharedValue<number>;
@@ -36,27 +36,27 @@ const MIDDLE_SCALE = 0.9;
 const BACK_SCALE = 0.38;
 
 const IDLE_IMAGES = {
-  idle: require("../../assets/characters/elf-baby-idle.png"),
-  blinkHalf: require("../../assets/characters/elf-baby-blink-half.png"),
-  blinkClosed: require("../../assets/characters/elf-baby-blink-closed.png"),
+  idle: require("../../../assets/characters/elf-baby-idle.png"),
+  blinkHalf: require("../../../assets/characters/elf-baby-blink-half.png"),
+  blinkClosed: require("../../../assets/characters/elf-baby-blink-closed.png"),
 };
 
 const BACK_CRAWL_IMAGES = [
-  require("../../assets/characters/back-crawl-1.png"),
-  require("../../assets/characters/back-crawl-2.png"),
-  require("../../assets/characters/back-crawl-3.png"),
-  require("../../assets/characters/back-crawl-4.png"),
-  require("../../assets/characters/back-crawl-5.png"),
-  require("../../assets/characters/back-crawl-6.png"),
+  require("../../../assets/characters/back-crawl-1.png"),
+  require("../../../assets/characters/back-crawl-2.png"),
+  require("../../../assets/characters/back-crawl-3.png"),
+  require("../../../assets/characters/back-crawl-4.png"),
+  require("../../../assets/characters/back-crawl-5.png"),
+  require("../../../assets/characters/back-crawl-6.png"),
 ];
 
 const FORWARD_CRAWL_IMAGES = [
-  require("../../assets/characters/forward-crawl-1.png"),
-  require("../../assets/characters/forward-crawl-2.png"),
-  require("../../assets/characters/forward-crawl-3.png"),
-  require("../../assets/characters/forward-crawl-4.png"),
-  require("../../assets/characters/forward-crawl-5.png"),
-  require("../../assets/characters/forward-crawl-6.png"),
+  require("../../../assets/characters/forward-crawl-1.png"),
+  require("../../../assets/characters/forward-crawl-2.png"),
+  require("../../../assets/characters/forward-crawl-3.png"),
+  require("../../../assets/characters/forward-crawl-4.png"),
+  require("../../../assets/characters/forward-crawl-5.png"),
+  require("../../../assets/characters/forward-crawl-6.png"),
 ];
 
 type IdleFrame = keyof typeof IDLE_IMAGES;

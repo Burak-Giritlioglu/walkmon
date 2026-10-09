@@ -1,41 +1,17 @@
-import type {
-  BabyAction,
-} from "../world/worldObjects";
+import type { BabyAction } from "../../world/worldTypes";
+import type { ActivityDefinition } from "../../character/activityTypes";
 
-import type {
-  CharacterStat,
-} from "./stats";
-
-export type StatReward = {
-  stat: CharacterStat;
-  amount: number;
-};
-
-export type ActivityDefinition = {
-  action: BabyAction;
-
-  duration: number;
-
-  statRewards: StatReward[];
-};
-
-export const ACTIVITIES: Partial<
-  Record<
-    BabyAction,
-    ActivityDefinition
-  >
+export const BABY_ACTIVITIES: Partial<
+  Record<BabyAction, ActivityDefinition>
 > = {
   READING: {
     action: "READING",
-
-    duration: 5000,
-
+    duration: 20000,
     statRewards: [
       {
         stat: "INTELLIGENCE",
         amount: 1,
       },
-
       {
         stat: "CURIOSITY",
         amount: 1,
@@ -45,15 +21,12 @@ export const ACTIVITIES: Partial<
 
   PLAYING: {
     action: "PLAYING",
-
     duration: 5000,
-
     statRewards: [
       {
         stat: "CREATIVITY",
         amount: 1,
       },
-
       {
         stat: "STRENGTH",
         amount: 1,
@@ -63,9 +36,7 @@ export const ACTIVITIES: Partial<
 
   LOOKING_OUTSIDE: {
     action: "LOOKING_OUTSIDE",
-
     duration: 5000,
-
     statRewards: [
       {
         stat: "CURIOSITY",
@@ -74,9 +45,3 @@ export const ACTIVITIES: Partial<
     ],
   },
 };
-
-export function getActivity(
-  action: BabyAction
-): ActivityDefinition | null {
-  return ACTIVITIES[action] ?? null;
-}

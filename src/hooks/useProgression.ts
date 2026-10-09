@@ -3,8 +3,8 @@ import {
 } from "react";
 
 import {
-  BABY_MILESTONES,
-} from "../progression/milestones";
+  getAllMilestones,
+} from "../progression/stageMilestones";
 
 const STARTING_OBJECT_IDS = [
   "crib",
@@ -77,12 +77,12 @@ export function useProgression({
   // =========================
 
   const revealedMilestones =
-    BABY_MILESTONES.filter(
-      (milestone) =>
-        revealedMilestoneIds.includes(
-          milestone.id
-        )
-    );
+          getAllMilestones().filter(
+            (milestone) =>
+              revealedMilestoneIds.includes(
+                milestone.id
+              )
+      );
 
   // =========================
   // OBJECT UNLOCKS

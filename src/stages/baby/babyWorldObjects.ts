@@ -1,39 +1,6 @@
-import type { NeedType } from "../character/needs";
 import { Dimensions } from "react-native";
 
-export type BabyAction =
-  | "PLAYING"
-  | "SLEEPING"
-  | "WARMING"
-  | "EATING"
-  | "READING"
-  | "LOOKING_OUTSIDE";
-
-export type NeedEffect = {
-  need: NeedType;
-  amount: number;
-  interval: number;
-};
-
-export type WorldObject = {
-  id: string;
-  name: string;
-
-  x: number;
-  y: number;
-
-  width: number;
-  height: number;
-
-  interactionPoint: {
-    x: number;
-    y: number;
-  };
-
-  action: BabyAction;
-
-  effect?: NeedEffect;
-};
+import type { WorldObject } from "../../world/worldTypes";
 
 const SCREEN_WIDTH =
   Dimensions.get("window").width;

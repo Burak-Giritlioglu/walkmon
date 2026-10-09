@@ -4,23 +4,28 @@ import {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import type { WorldObject } from "../world/worldObjects";
 
-export const HOME_POSITION = {
-  x: 190,
-  y: 750,
-};
-
-const WALK_SPEED = 70;
+import type { WorldObject } from "../world/worldTypes";
 
 export type MovementDirection =
   | "IDLE"
   | "BACK"
   | "FORWARD";
 
-export function useCharacterMovement() {
-  const babyX = useSharedValue(HOME_POSITION.x);
-  const babyY = useSharedValue(HOME_POSITION.y);
+type MovementConfig = {
+  homePosition: {
+    x: number;
+    y: number;
+  };
+  speed: number;
+};
+
+export function useCharacterMovement({
+  homePosition,
+  speed,
+}: MovementConfig) {
+  const characterX = useSharedValue(homePosition.x);
+  const characterY = useSharedValue(homePosition.y);
 
   const movementDirection =
     useSharedValue<MovementDirection>("IDLE");
@@ -29,20 +34,20 @@ export function useCharacterMovement() {
     object: WorldObject,
     onArrival: (object: WorldObject) => void
   ) => {
-    cancelAnimation(babyX);
-    cancelAnimation(babyY);
+    cancelAnimation(characterX);
+    cancelAnimation(characterY);
 
     const targetX = object.interactionPoint.x;
     const targetY = object.interactionPoint.y;
 
-    const dx = targetX - babyX.value;
-    const dy = targetY - babyY.value;
+    const dx = targetX - characterX.value;
+    const dy = targetY - characterY.value;
 
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     const duration = Math.max(
       250,
-      (distance / WALK_SPEED) * 1000
+      (distance / speed) * 1000
     );
 
     if (dy < 0) {
@@ -53,11 +58,11 @@ export function useCharacterMovement() {
       movementDirection.value = "IDLE";
     }
 
-    babyX.value = withTiming(targetX, {
+    characterX.value = withTiming(targetX, {
       duration,
     });
 
-    babyY.value = withTiming(
+    characterY.value = withTiming(
       targetY,
       {
         duration,
@@ -72,17 +77,17 @@ export function useCharacterMovement() {
   };
 
   const moveHome = (onArrival?: () => void) => {
-    cancelAnimation(babyX);
-    cancelAnimation(babyY);
+    cancelAnimation(characterX);
+    cancelAnimation(characterY);
 
-    const dx = HOME_POSITION.x - babyX.value;
-    const dy = HOME_POSITION.y - babyY.value;
+    const dx = homePosition.x - characterX.value;
+    const dy = homePosition.y - characterY.value;
 
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     const duration = Math.max(
       250,
-      (distance / WALK_SPEED) * 1000
+      (distance / speed) * 1000
     );
 
     if (dy < 0) {
@@ -93,12 +98,12 @@ export function useCharacterMovement() {
       movementDirection.value = "IDLE";
     }
 
-    babyX.value = withTiming(HOME_POSITION.x, {
+    characterX.value = withTiming(homePosition.x, {
       duration,
     });
 
-    babyY.value = withTiming(
-      HOME_POSITION.y,
+    characterY.value = withTiming(
+      homePosition.y,
       {
         duration,
       },
@@ -115,8 +120,8 @@ export function useCharacterMovement() {
   };
 
   return {
-    babyX,
-    babyY,
+    characterX,
+    characterY,
     movementDirection,
     moveToObject,
     moveHome,

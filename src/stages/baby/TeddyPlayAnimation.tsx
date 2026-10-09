@@ -40,18 +40,18 @@ const PLAY_Y = 590;
 const FRAME_DURATION = 150;
 
 const FRAMES = [
-  require("../../assets/characters/baby-teddy-play-1.png"),
-  require("../../assets/characters/baby-teddy-play-2.png"),
-  require("../../assets/characters/baby-teddy-play-3.png"),
-  require("../../assets/characters/baby-teddy-play-4.png"),
-  require("../../assets/characters/baby-teddy-play-5.png"),
-  require("../../assets/characters/baby-teddy-play-6.png"),
-  require("../../assets/characters/baby-teddy-play-7.png"),
-  require("../../assets/characters/baby-teddy-play-8.png"),
-  require("../../assets/characters/baby-teddy-play-9.png"),
-  require("../../assets/characters/baby-teddy-play-10.png"),
-  require("../../assets/characters/baby-teddy-play-11.png"),
-  require("../../assets/characters/baby-teddy-play-12.png"),
+  require("../../../assets/characters/baby-teddy-play-1.png"),
+  require("../../../assets/characters/baby-teddy-play-2.png"),
+  require("../../../assets/characters/baby-teddy-play-3.png"),
+  require("../../../assets/characters/baby-teddy-play-4.png"),
+  require("../../../assets/characters/baby-teddy-play-5.png"),
+  require("../../../assets/characters/baby-teddy-play-6.png"),
+  require("../../../assets/characters/baby-teddy-play-7.png"),
+  require("../../../assets/characters/baby-teddy-play-8.png"),
+  require("../../../assets/characters/baby-teddy-play-9.png"),
+  require("../../../assets/characters/baby-teddy-play-10.png"),
+  require("../../../assets/characters/baby-teddy-play-11.png"),
+  require("../../../assets/characters/baby-teddy-play-12.png"),
 ];
 
 export default function TeddyPlayAnimation({

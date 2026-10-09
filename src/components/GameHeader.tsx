@@ -1,30 +1,33 @@
-
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
 import { colors, typography } from "../theme/theme";
 
 type Props = {
-  stage: "BABY" | "CHILD";
   lifetimeSteps: number;
+  onOpenSettings?: () => void;
 };
 
 export default function GameHeader({
-  stage,
   lifetimeSteps,
+  onOpenSettings,
 }: Props) {
   return (
     <View style={styles.container}>
-      <View style={styles.titleGroup}>
-        <Text style={styles.title} numberOfLines={1}>
-          Walkmon
-        </Text>
-
-        <Text style={styles.stage}>
-          {stage === "BABY"
-            ? "Baby Journey"
-            : "Child Journey"}
-        </Text>
-      </View>
+      <Pressable
+        style={styles.settingsButton}
+        onPress={onOpenSettings}
+        accessibilityRole="button"
+        accessibilityLabel="Open settings"
+        disabled={!onOpenSettings}
+      >
+        <Text style={styles.settingsIcon}>⚙️</Text>
+      </Pressable>
 
       <View style={styles.steps}>
         <View style={styles.stepsTopRow}>
@@ -53,23 +56,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "transparent",
   },
-  titleGroup: {
-    flex: 1,
-    marginRight: 16,
+  settingsButton: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  title: {
-    fontFamily: typography.display.fontFamily,
-    fontWeight: typography.display.fontWeight,
+  settingsIcon: {
     fontSize: 25,
-    letterSpacing: -0.6,
-    color: colors.textPrimary,
-  },
-  stage: {
-    marginTop: 2,
-    fontSize: 11,
-    fontWeight: "600",
-    letterSpacing: 0.5,
-    color: colors.textSecondary,
   },
   steps: {
     flexShrink: 0,

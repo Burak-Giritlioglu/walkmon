@@ -1,93 +1,60 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useRef, useState } from "react";
 
-import {
-  INITIAL_LIFETIME_STEPS,
-} from "../steps/steps";
+import { INITIAL_LIFETIME_STEPS } from "../steps/steps";
 
 type Props = {
   initialLifetimeSteps?: number;
 };
 
 export function useSteps({
-  initialLifetimeSteps =
-    INITIAL_LIFETIME_STEPS,
+  initialLifetimeSteps = INITIAL_LIFETIME_STEPS,
 }: Props = {}) {
-  const [
-    lifetimeSteps,
-    setLifetimeSteps,
-  ] =
-    useState<number>(
-      initialLifetimeSteps
-    );
+  const [lifetimeSteps, setLifetimeSteps] = useState<number>(
+    initialLifetimeSteps
+  );
 
-  const lifetimeStepsRef =
-    useRef<number>(
-      initialLifetimeSteps
-    );
+  const lifetimeStepsRef = useRef<number>(
+    initialLifetimeSteps
+  );
 
-  // =========================
-  // LOAD / EXTERNAL UPDATE
-  // =========================
+  // HealthKit updates must never reduce saved progress.
+  const setSteps = useCallback((amount: number) => {
+    if (!Number.isFinite(amount)) {
+      return;
+    }
 
-  useEffect(() => {
-    setLifetimeSteps(
-      initialLifetimeSteps
-    );
+    const incomingSteps = Math.max(0, Math.round(amount));
 
-    lifetimeStepsRef.current =
-      initialLifetimeSteps;
-  }, [initialLifetimeSteps]);
+    setLifetimeSteps((current) => {
+      const updated = Math.max(current, incomingSteps);
 
-  // =========================
-  // SET STEPS
-  // =========================
+      lifetimeStepsRef.current = updated;
 
-  const setSteps = (
-    amount: number
-  ) => {
-    const updated =
-      Math.max(
+      return updated;
+    });
+  }, []);
+
+  // Debug-only step additions.
+  const addSteps = useCallback((amount: number) => {
+    if (!Number.isFinite(amount)) {
+      return;
+    }
+
+    setLifetimeSteps((current) => {
+      const updated = Math.max(
         0,
-        Math.round(amount)
+        Math.round(current + amount)
       );
 
-    lifetimeStepsRef.current =
-      updated;
+      lifetimeStepsRef.current = updated;
 
-    setLifetimeSteps(updated);
-  };
-
-  // =========================
-  // ADD STEPS
-  // =========================
-
-  const addSteps = (
-    amount: number
-  ) => {
-    setLifetimeSteps(
-      (current) => {
-        const updated =
-          Math.max(
-            0,
-            current + amount
-          );
-
-        lifetimeStepsRef.current =
-          updated;
-
-        return updated;
-      }
-    );
-  };
+      return updated;
+    });
+  }, []);
 
   return {
     lifetimeSteps,
     lifetimeStepsRef,
-
     setSteps,
     addSteps,
   };
