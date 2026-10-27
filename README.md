@@ -24,6 +24,15 @@ Instead of treating walking as just another fitness statistic, Walkmon transform
   From the first prototype to the current playable version.
 </p>
 
+
+## Gameplay Demo
+
+A short preview of Walkmon's gameplay, featuring character
+movement, autonomous interactions, and room progression.
+
+https://github.com/user-attachments/assets/b244feed-0950-4547-8451-cb673e996004
+
+
 ## Key Features
 
 **Real-World Step Integration**
