@@ -11,8 +11,8 @@ Instead of treating walking as just another fitness statistic, Walkmon transform
 ## Screenshots
 
 <p align="center">
-  <img src="screenshots/initial.png" alt="Walkmon Initial Version" width="280"/>
-  <img src="screenshots/final.png" alt="Walkmon Current Version" width="280"/>
+  <img src="screenshots/initial.PNG" alt="Walkmon Initial Version" width="280"/>
+  <img src="screenshots/final.PNG" alt="Walkmon Current Version" width="280"/>
 </p>
 
 <p align="center">
