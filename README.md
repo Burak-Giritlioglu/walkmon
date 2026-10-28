@@ -59,7 +59,7 @@ https://github.com/user-attachments/assets/b244feed-0950-4547-8451-cb673e996004
 
 - Animated character movement and activities.
 - Custom character sprites and environment assets.
-- React Native Skia and Reanimated for rendering and animation.
+- React Native Reanimated for animations.
 
 **Persistent Progression**
 
@@ -75,7 +75,6 @@ https://github.com/user-attachments/assets/b244feed-0950-4547-8451-cb673e996004
 | Expo | Development and native build tooling |
 | TypeScript | Type-safe application logic |
 | Apple HealthKit | Real-world walking activity |
-| React Native Skia | Custom 2D rendering |
 | React Native Reanimated | Animations |
 | AsyncStorage | Local game persistence |
 | Swift / Xcode | Native iOS integration and builds |
